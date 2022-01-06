@@ -7,7 +7,7 @@ import 'package:otp_verification/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
 class OtpScreen extends StatefulWidget {
-  String? phoneNo;
+  String phoneNo;
 
   OtpScreen(this.phoneNo);
 
@@ -16,16 +16,40 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  String? verificationId;
-  bool? showLoading = false;
+  String verificationId;
+  bool showLoading = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
-  String? userPin;
+  String userPin;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+
+  Timer _timer;
+  int _start = 35;
+bool timerstoped=false;
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timerstoped=true;
+            timer.cancel();
+          });
+        } else {
+          setState(() {
+            timerstoped=false;
+            _start--;
+          });
+        }
+      },
+    );
+  }
+
 
   @override
   void initState() {
     varifyPhoneNumber();
-
+    startTimer();
     super.initState();
   }
 
@@ -73,16 +97,39 @@ class _OtpScreenState extends State<OtpScreen> {
                   ), // end PinEntryTextField()
                 ), // end Padding()
               ),
-              Padding(
+              // timerstoped? Align(
+              //   alignment: Alignment.bottomRight,
+              //   child: FlatButton(
+              //     child: Text('Resend Code'),
+              //     onPressed: () {
+              //       varifyPhoneNumber();
+              //     },
+              //   ),
+              // ):Container(),
+
+             timerstoped?
+             Row(
+               mainAxisAlignment: MainAxisAlignment.center,
+               mainAxisSize: MainAxisSize.max,
+               children: [
+                 FlatButton(
+                   child: Text('Resend Code'),
+                   onPressed: () {
+                     varifyPhoneNumber();
+                     startTimer();
+                   },
+                 ),
+               ],
+             )  :Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('Resend Code in 35 sec'),
+                child: Text('Resend Code in ${_start} sec'),
               ),
               RaisedButton(
                 onPressed: () {
                   print('user pin===========================================${userPin}');
-                  PhoneAuthCredential? phoneAuthCredential = PhoneAuthProvider
+                  PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider
                       .credential(verificationId: verificationId,
-                      smsCode: userPin) as PhoneAuthCredential?;
+                      smsCode: userPin) as PhoneAuthCredential;
                   sinInWithPhoneAuthCredentials(phoneAuthCredential);
                 },
                 color: Colors.blue[400],
@@ -93,20 +140,13 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
             ],
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: FlatButton(
-              child: Text('Resend Code'),
-              onPressed: () {},
-            ),
-          )
         ],
       ),
     );
   }
 
   void sinInWithPhoneAuthCredentials(
-      PhoneAuthCredential? phoneAuthCredential) async {
+      PhoneAuthCredential phoneAuthCredential) async {
     try {
       final authCredential = await _auth.signInWithCredential(
           phoneAuthCredential);
@@ -116,7 +156,7 @@ class _OtpScreenState extends State<OtpScreen> {
       }
     } on FirebaseAuthException catch (e) {
       showLoading = false;
-      scaffoldKey.currentState!.showSnackBar(
+      scaffoldKey.currentState.showSnackBar(
           SnackBar(content: Text(e.message)));
       print(e);
     }
@@ -133,7 +173,7 @@ class _OtpScreenState extends State<OtpScreen> {
           // sinInWithPhoneAuthCredentials( phoneAuthCredential) {}
         },
         verificationFailed: (verificationFailed) async {
-          scaffoldKey.currentState!.showSnackBar(
+          scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text(verificationFailed.message)));
         },
         codeSent: (verificationId, sendingToken) async {

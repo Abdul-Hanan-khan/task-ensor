@@ -9,7 +9,7 @@ class CredentialsScreen extends StatefulWidget {
 }
 
 class _CredentialsScreenState extends State<CredentialsScreen> {
-  String? phone;
+  String phone;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +22,6 @@ class _CredentialsScreenState extends State<CredentialsScreen> {
             children: [
               SizedBox(
                 height: 20,
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: FlatButton(
-                  onPressed: () {},
-                  child: Text('Skip'),
-                ),
               ),
               Image.asset('assets/img.png'),
               Text(
@@ -85,7 +78,7 @@ class _CredentialsScreenState extends State<CredentialsScreen> {
                           // border: OutlineInputBorder(),
                         ),
                         onChanged: (val) {
-                          setState(() => phone = "+92"+val);
+                          setState(() => phone = "+1"+val);
                         },
                       ),
                     )

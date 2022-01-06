@@ -1,7 +1,7 @@
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'otp/credentials.dart';
 
 void main()async {
