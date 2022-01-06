@@ -11,6 +11,8 @@ class CredentialsScreen extends StatefulWidget {
 class _CredentialsScreenState extends State<CredentialsScreen> {
   String phone;
 
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
